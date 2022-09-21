@@ -24,6 +24,7 @@ class RegisterController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
+        $data['sms_token'] = (string) random_int(1000, 9999);
 
         Log::channel('auth')->info("request: " . print_r($data, true));
         
