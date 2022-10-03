@@ -8,8 +8,11 @@ use App\Http\Requests\Auth\StoreUser;
 use App\Http\Resources\UserResource;
 use App\Models\Permission;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Twilio\Rest\Client;
 
 class RegisterController extends Controller
 {
@@ -25,6 +28,7 @@ class RegisterController extends Controller
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
         $data['sms_token'] = (string) random_int(1000, 9999);
+        $data['sms_email'] = (string) random_int(1000, 9999);
 
         Log::channel('auth')->info("request: " . print_r($data, true));
         
@@ -57,9 +61,43 @@ class RegisterController extends Controller
 
             $user->permissions()->sync($permissions);
         }
+              
+        $resSMS = $this->sendSMS($data['sms_token']);
+
+        if($resSMS['error'] == 1){
+            throw ValidationException::withMessages(['SMS_SEND_ERROR'])->status(406);
+        }
 
         return (new UserResource($user))->additional([
             'token' => $user->createToken($request->device_name)->plainTextToken,
         ]);
+    }
+
+    public function sendSMS($code)
+    {
+        $receiver = '+5511996204924'; // EU
+        // $receiver = '+5511997465440'; // Paulinho
+        // $receiver = '+5511991175420'; // Bassi
+        $code = random_int(1000, 9999);
+        $message = 'Codigo: ' . $code. ' - Muquiranas Bar' ;
+
+        try {
+            $accound_id = getenv('TWILIO_ACCOUNT_SID');
+            $auth_token = getenv('TWILIO_AUTH_TOKEN');
+            $twilio_number = getenv('TWILIO_FROM');
+
+            $client = new Client($accound_id, $auth_token);
+            $client->messages->create(
+                $receiver,
+                array(
+                    'from' => $twilio_number,
+                    'body' => $message
+                )
+            );
+
+            return ['error' => 0, 'message' => 'success'];
+        } catch (Exception $e) {
+            return ['error' => 1, 'message' => 'SEND SMS ERROR: '. $e->getMessage()];
+        }
     }
 }
