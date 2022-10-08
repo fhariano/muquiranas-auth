@@ -22,10 +22,8 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('sms_token', 10)->nullable();
-            $table->boolean('sms_confirmed')->default(false);
-            $table->string('email_token', 10)->nullable();
-            $table->boolean('email_confirmed')->default(false);
+            $table->string('confirmation_token', 10)->nullable();
+            $table->boolean('cell_confirmed')->default(false);
             $table->string('device')->nullable();
             $table->rememberToken();
             $table->softDeletes();

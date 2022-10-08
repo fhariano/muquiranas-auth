@@ -27,8 +27,7 @@ class RegisterController extends Controller
     {
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
-        $data['sms_token'] = (string) random_int(1000, 9999);
-        $data['email_token'] = (string) random_int(1000, 9999);
+        $data['confirmation_token'] = (string) random_int(1000, 9999);
 
         Log::channel('auth')->info("request: " . print_r($data, true));
         
@@ -58,16 +57,19 @@ class RegisterController extends Controller
 
             $permissions = Permission::select('id')->whereIn('name', $permissionsCustomer)->orderBy('id', 'asc')->get();
             // Log::channel('auth')->info("Permissons Ids: " . print_r($permissions->toArray(), true));
-
+            
             $user->permissions()->sync($permissions);
         }
-              
-        $resSMS = $this->sendSMS($data['sms_token']);
-
+        
+        Log::channel('auth')->info("User: ".$user->email." - CONFIRMATION_TOKEM: " . $user->confirmation_token);
+        
+        $resSMS = $this->sendSMS($data['confirmation_token']);
+        
         if($resSMS['error'] == 1){
+            Log::channel('auth')->error("SMS SEND ERROR!");
             throw ValidationException::withMessages(['SMS_SEND_ERROR'])->status(406);
         }
-
+        
         return (new UserResource($user))->additional([
             'token' => $user->createToken($request->device_name)->plainTextToken,
         ]);
@@ -78,14 +80,14 @@ class RegisterController extends Controller
         $receiver = '+5511996204924'; // EU
         // $receiver = '+5511997465440'; // Paulinho
         // $receiver = '+5511991175420'; // Bassi
-        $code = random_int(1000, 9999);
+        // $code = random_int(1000, 9999);
         $message = 'Codigo: ' . $code. ' - Muquiranas Bar' ;
 
         try {
             $accound_id = getenv('TWILIO_ACCOUNT_SID');
             $auth_token = getenv('TWILIO_AUTH_TOKEN');
             $twilio_number = getenv('TWILIO_FROM');
-
+            
             $client = new Client($accound_id, $auth_token);
             $client->messages->create(
                 $receiver,
@@ -94,9 +96,10 @@ class RegisterController extends Controller
                     'body' => $message
                 )
             );
-
+            
             return ['error' => 0, 'message' => 'success'];
         } catch (Exception $e) {
+            Log::channel('auth')->error("SMS ERROR: " . print_r($e->getMessage(), true));
             return ['error' => 1, 'message' => 'SEND SMS ERROR: '. $e->getMessage()];
         }
     }

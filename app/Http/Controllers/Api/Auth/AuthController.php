@@ -23,14 +23,14 @@ class AuthController extends Controller
     {
         $user = $this->model::where('email', $request->email)->firstOrFail();
 
-        if (!$user || !Hash::check($request->password, $user->password) || !$user->sms_confirmed) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             $msg = ['EMAIL_NOT_FOUND'];
             if (!Hash::check($request->password, $user->password)) {
                 $msg = ['INVALID_PASSWORD'];
             }
-            if(!$user->sms_confirmed){
-                $msg = ['SMS_CONFIRMED'];
-            }
+            // if(!$user->cell_confirmed){
+            //     $msg = ['CELL_NOT_CONFIRMED'];
+            // }
             throw ValidationException::withMessages($msg)->status(406);
         }
 

@@ -24,8 +24,8 @@ class User extends Authenticatable
         'cell_phone',
         'email',
         'password',
-        'sms_token',
-        'email_token',
+        'confirmation_token',
+        'cell_confirmed',
     ];
 
     /**
