@@ -30,6 +30,7 @@ services:
     volumes:
       - ./:/var/www
       - ./docker/nginx/:/etc/nginx/conf.d/
+      - ./docker/supervisor/horizon.conf:/etc/supervisor/conf.d/
     networks:
       - microauth
 
