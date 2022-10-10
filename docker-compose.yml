@@ -16,7 +16,7 @@ services:
     volumes:
       - ./:/var/www
     depends_on:
-      - redis
+      - redis_auth
       - queue
     networks:
       - microauth
@@ -63,12 +63,12 @@ services:
     volumes:
       - ./:/var/www
     depends_on: 
-      - redis
+      - redis_auth
     networks:
       - microauth
 
   # redis
-  redis:
+  redis_auth:
     image: redis:latest
     networks:
       - microauth
