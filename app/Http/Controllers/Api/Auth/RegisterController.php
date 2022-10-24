@@ -20,12 +20,14 @@ class RegisterController extends Controller
     protected $model;
     protected $url;
     protected $http;
+    protected $token;
 
     public function __construct(User $user)
     {
         $this->model = $user;
         $this->url = config('microservices.micro_notification.url');
         $this->http = Http::acceptJson();
+        $this->token = $this->getToken();
     }
 
     public function store(StoreUser $request)
@@ -68,36 +70,91 @@ class RegisterController extends Controller
 
         Log::channel('auth')->info("User: " . $user->email . " - CONFIRMATION_TOKEM: " . $user->confirmation_token);
         $message = "Código: " . $data['confirmation_token'] . " - Muquiranas Bar";
+
         $sendSms = $this->sendSMS($data['cell_phone'], $message);
-        
         if ($sendSms['error'] == 1) {
-            Log::channel('auth')->error("SMS SEND: ERROR!");
+            Log::channel('auth')->error("SMS SEND: " . $sendSms['message']);
             throw ValidationException::withMessages(['SMS_SEND_ERROR'])->status(406);
         } else {
             Log::channel('auth')->info("SMS SEND: SUCCESS!");
         }
-        
+
+        $email = $user->email;
+        $subject = "[Muquirana's Bar] Código de Verificação: " . $data['confirmation_token'];
+        $message = "Utilize o código de verificação: " . $data['confirmation_token'] . "<br>para confirmar seu e-mail e celular!";
+
+        $sendEmail = $this->sendEmail($email, $subject, $message);
+        if ($sendEmail['error'] == 1) {
+            Log::channel('auth')->error("EMAIL SEND: " . $sendEmail['message']);
+            throw ValidationException::withMessages(['EMAIL_SEND_ERROR'])->status(406);
+        } else {
+            Log::channel('auth')->info("EMAIL SEND: SUCCESS!");
+        }
+
         return (new UserResource($user))->additional([
             'token' => $user->createToken($request->device_name)->plainTextToken,
         ]);
     }
 
     public function sendSMS($cellPhone, $message)
-    {
-        Log::channel('auth')->info("SendSMS: " . $cellPhone . " - Message: " . $message);
+    {   
+        Log::channel('notification')->info("SendSMS TOKEN: " . $this->token);
+        
+        Log::channel('notification')->info("SendSMS: " . $cellPhone . " - Message: " . $message);
         $receiver = '+55' . $cellPhone;
         try {
-
-            $response = $this->http->get($this->url . '/send-sms', [
+            $response = $this->http->withToken($this->token)->get($this->url . '/send-sms', [
                 'to' => $receiver,
                 'message' => $message,
             ]);
-            // return response()->json(json_decode($response->body()), $response->status());
+            Log::channel('auth')->info("SendSMS body: " . print_r($response->body(), true) . " - status code: " . $response->status());
+
+            if ($response->status() > 299) {
+                return ['error' => 1, 'message' => 'SEND SMS STATUS CODE: ' . $response->status()];
+            }
 
             return ['error' => 0, 'message' => 'success'];
         } catch (Exception $e) {
             Log::channel('auth')->error("SMS ERROR: " . print_r($e->getMessage(), true));
             return ['error' => 1, 'message' => 'SEND SMS ERROR: ' . $e->getMessage()];
         }
+    }
+
+    public function sendEmail($email, $subject, $message)
+    {      
+        Log::channel('notification')->info("SendEMAIL TOKEN: " . $this->token);
+        Log::channel('notification')->info("SendEMAIL: " . $email . " - Subject: " . $subject . " - Message: " . $message);
+        try {
+            $response = $this->http->withToken($this->token)->get($this->url . '/send-email', [
+                'email' => $email,
+                'subject' => $subject,
+                'message' => $message,
+            ]);
+            Log::channel('auth')->info("SendEMAIL body: " . print_r($response->body(), true) . " - status code: " . $response->status());
+            
+            if ($response->status() > 299) {
+                return ['error' => 1, 'message' => 'SEND EMAIL STATUS CODE: ' . $response->status()];
+            }
+
+            return ['error' => 0, 'message' => 'success'];
+        } catch (Exception $e) {
+            Log::channel('auth')->error("EMAIL ERROR: " . print_r($e->getMessage(), true));
+            return ['error' => 1, 'message' => 'SEND EMAIL ERROR: ' . $e->getMessage()];
+        }
+    }
+
+    public function getToken() {
+        Log::channel('auth')->info("TOKEN API: ".config('api.notification.email')." - password: " . 
+            config('api.notification.password'). " - device: ".config('api.notification.device'));
+        $result = $this->http->post($this->url . '/auth', [
+            'email' => config('api.notification.email'),
+            'password' => config('api.notification.password'),
+            'device_name' => config('api.notification.device'),
+        ]);
+        Log::channel('auth')->info("TOKEN API: " . print_r($result->body(), true) . " - status code: " . $result->status());
+        $body = json_decode($result->body());
+        Log::channel('auth')->info("Access Token: " . $body->token);
+        
+        return $body->token;
     }
 }

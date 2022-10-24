@@ -119,6 +119,11 @@ return [
             'path' => storage_path('logs/authentication.log'),
             'days' => 30,
         ],
+        'notification' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/notification.log'),
+            'days' => 30,
+        ],
     ],
 
 ];
