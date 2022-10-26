@@ -5,7 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class AuthUser extends FormRequest
+class CodeConfirmation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,8 +27,6 @@ class AuthUser extends FormRequest
         $apikeys = config('acl.apiKeys');
         $rules = [
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required', 'min:4', 'max:20'],
-            'device_name' => ['required', 'string', 'max:200'],
             'apikey' => ['required', 'string', 'max:50', Rule::in($apikeys['web'], $apikeys['mobile'])],
         ];
 

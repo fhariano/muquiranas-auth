@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AddPermissionsUser;
+use App\Http\Requests\Auth\CodeConfirmation;
 use App\Http\Requests\Auth\StoreUser;
 use App\Http\Resources\UserResource;
 use App\Models\Permission;
 use App\Models\User;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Twilio\Rest\Client;
 
 class RegisterController extends Controller
 {
@@ -26,7 +24,7 @@ class RegisterController extends Controller
     {
         $this->model = $user;
         $this->url = config('microservices.micro_notification.url');
-        $this->http = Http::acceptJson();
+        $this->http = Http::acceptJson()->timeout(120);
         $this->token = $this->getToken();
     }
 
@@ -96,10 +94,46 @@ class RegisterController extends Controller
         ]);
     }
 
-    public function sendSMS($cellPhone, $message)
-    {   
-        Log::channel('notification')->info("SendSMS TOKEN: " . $this->token);
+    public function resendCode(CodeConfirmation $request)
+    {
+        $data = $request->validated();
+        $user = $this->model::where('email', $request->email)->firstOrFail();
         
+        if (!$user) {
+            $msg = ['EMAIL_NOT_FOUND'];
+            throw ValidationException::withMessages($msg)->status(406);
+        }
+
+        Log::channel('auth')->info("RESEND CODE User: " . $user->email . " - CONFIRMATION_TOKEM: " . $user->confirmation_token);
+        $message = "Código: " . $user->confirmation_token . " - Muquiranas Bar";
+
+        $sendSms = $this->sendSMS($user->cell_phone, $message);
+        if ($sendSms['error'] == 1) {
+            Log::channel('auth')->error("SMS SEND: " . $sendSms['message']);
+            throw ValidationException::withMessages(['SMS_SEND_ERROR'])->status(406);
+        } else {
+            Log::channel('auth')->info("SMS SEND: SUCCESS!");
+        }
+
+        $email = $user->email;
+        $subject = "[Muquirana's Bar] Código de Verificação: " . $user->confirmation_token;
+        $message = "Utilize o código de verificação: " . $user->confirmation_token . "<br>para confirmar seu e-mail e celular!";
+
+        $sendEmail = $this->sendEmail($email, $subject, $message);
+        if ($sendEmail['error'] == 1) {
+            Log::channel('auth')->error("EMAIL SEND: " . $sendEmail['message']);
+            throw ValidationException::withMessages(['EMAIL_SEND_ERROR'])->status(406);
+        } else {
+            Log::channel('auth')->info("EMAIL SEND: SUCCESS!");
+        }
+        
+        return response()->json(['error' => 0, 'message' => 'Código enviado com sucesso!']);
+    }
+
+    public function sendSMS($cellPhone, $message)
+    {
+        Log::channel('notification')->info("SendSMS TOKEN: " . $this->token);
+
         Log::channel('notification')->info("SendSMS: " . $cellPhone . " - Message: " . $message);
         $receiver = '+55' . $cellPhone;
         try {
@@ -121,7 +155,7 @@ class RegisterController extends Controller
     }
 
     public function sendEmail($email, $subject, $message)
-    {      
+    {
         Log::channel('notification')->info("SendEMAIL TOKEN: " . $this->token);
         Log::channel('notification')->info("SendEMAIL: " . $email . " - Subject: " . $subject . " - Message: " . $message);
         try {
@@ -131,7 +165,7 @@ class RegisterController extends Controller
                 'message' => $message,
             ]);
             Log::channel('auth')->info("SendEMAIL body: " . print_r($response->body(), true) . " - status code: " . $response->status());
-            
+
             if ($response->status() > 299) {
                 return ['error' => 1, 'message' => 'SEND EMAIL STATUS CODE: ' . $response->status()];
             }
@@ -143,9 +177,10 @@ class RegisterController extends Controller
         }
     }
 
-    public function getToken() {
-        Log::channel('auth')->info("TOKEN API: ".config('api.notification.email')." - password: " . 
-            config('api.notification.password'). " - device: ".config('api.notification.device'));
+    public function getToken()
+    {
+        Log::channel('auth')->info("TOKEN API: " . config('api.notification.email') . " - password: " .
+            config('api.notification.password') . " - device: " . config('api.notification.device'));
         $result = $this->http->post($this->url . '/auth', [
             'email' => config('api.notification.email'),
             'password' => config('api.notification.password'),
@@ -154,7 +189,7 @@ class RegisterController extends Controller
         Log::channel('auth')->info("TOKEN API: " . print_r($result->body(), true) . " - status code: " . $result->status());
         $body = json_decode($result->body());
         Log::channel('auth')->info("Access Token: " . $body->token);
-        
+
         return $body->token;
     }
 }
