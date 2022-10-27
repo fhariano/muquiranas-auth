@@ -26,9 +26,10 @@ class StoreUser extends FormRequest
     {
         $apikeys = config('acl.apiKeys');
         $rules = [
-            'first_name' => ['required', 'string', 'min:3', 'max:100'],
-            'last_name' => ['required', 'string', 'min:3', 'max:100'],
+            'full_name' => ['required', 'string', 'min:3', 'max:100'],
+            'short_name' => ['required', 'string', 'min:3', 'max:100'],
             'password' => ['required', 'min:4', 'max:20'],
+            'cpf' => ['required', 'min:11', 'max:11', 'unique:users'],
             'cell_phone' => ['required', 'min:11', 'max:11', 'unique:users'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
             'device_name' => ['required', 'string', 'max:200'],
@@ -48,6 +49,7 @@ class StoreUser extends FormRequest
         return [
             'email.unique' => 'EMAIL_EXISTS',
             'cell_phone.unique' => 'PHONE_EXISTS',
+            'cpf.unique' => 'CPF_EXISTS',
         ];
     }
 }

@@ -26,9 +26,10 @@ class StoreUpdateUser extends FormRequest
         $uuid = $this->user;
 
         $rules = [
-            'first_name' => ['required', 'string', 'min:3', 'max:100'],
-            'last_name' => ['required', 'string', 'min:3', 'max:100'],
+            'full_name' => ['required', 'string', 'min:3', 'max:100'],
+            'short_name' => ['required', 'string', 'min:3', 'max:100'],
             'password' => ['required', 'min:4', 'max:20'],
+            'cpf' => ['required', 'min:11', 'max:11', "unique:users,cpf,{$uuid},uuid"],
             'cell_phone' => ['required', 'min:11', 'max:11', "unique:users,cell_phone,{$uuid},uuid"],
             'password' => ['required', 'min:4', 'max:20'],
             'email' => ['required', 'email', 'max:255', "unique:users,email,{$uuid},uuid"],
