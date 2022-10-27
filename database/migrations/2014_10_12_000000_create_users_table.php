@@ -17,6 +17,7 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->uuid('uuid');
             $table->string('full_name');
+            $table->string('short_name');
             $table->string('cpf', 11)->unique();
             $table->string('cell_phone', 11)->unique();
             $table->string('email')->unique();
