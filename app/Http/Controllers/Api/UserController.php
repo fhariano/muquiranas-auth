@@ -112,7 +112,7 @@ class UserController extends Controller
     public function updateCellConfirmed(Request $request, $identify)
     {
         $user = $this->model->where('uuid', $identify)->first();
-
+        
         try {
             if ($user) {
                 $user->update($request->all());
@@ -126,5 +126,23 @@ class UserController extends Controller
 
 
         return response()->json(['error' => false, 'message' => 'success',]);
+    }
+
+    public function updateAddress(Request $request, $identify)
+    {
+        Log::channel('auth')->info("UpdateAddress: " . print_r($request, true));
+        $user = $this->model->where('uuid', $identify)->first();
+        
+      
+        try {
+            if ($user) {
+                $user->update($request->all());
+            } else {
+                return ['error' => 99, 'message' => 'User not found'];
+            }
+        } catch (Exception $e) {
+            Log::channel('auth')->error("UpdateAddress ERROR: " . print_r($e->getMessage(), true));
+            return ['error' => 1, 'message' => 'UpdateAddress ERROR: ' . $e->getMessage()];
+        }
     }
 }
