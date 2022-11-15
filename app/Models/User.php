@@ -27,6 +27,14 @@ class User extends Authenticatable
         'password',
         'confirmation_token',
         'cell_confirmed',
+        'postal_code',
+        'street',
+        'number',
+        'complement',
+        'district',
+        'city',
+        'state',
+        'country'
     ];
 
     /**
