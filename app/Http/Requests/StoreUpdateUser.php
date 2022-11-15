@@ -24,6 +24,7 @@ class StoreUpdateUser extends FormRequest
      */
     public function rules()
     {
+        Log::channel('auth')->info("ROLES!");
         $uuid = $this->user;
 
         $rules = [
