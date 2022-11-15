@@ -24,6 +24,13 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'confirmation_token' => $this->confirmation_token,
             'cell_confirmed' => $this->cell_confirmed,
+            'postal_code' => $this->postal_code,
+            'street' => $this->street,
+            'number' => $this->number,
+            'district' => $this->district,
+            'city' => $this->city,
+            'state' => $this->state,
+            'country' => $this->country,
             'permissions' => PermissionResource::collection($this->permissions),
         ];
     }
