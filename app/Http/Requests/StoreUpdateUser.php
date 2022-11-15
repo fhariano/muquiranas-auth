@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class StoreUpdateUser extends FormRequest
 {
@@ -35,6 +36,7 @@ class StoreUpdateUser extends FormRequest
         ];
 
         if($this->method() == 'PUT'){
+            Log::channel('auth')->info("PUT ROLES!");
             $rules['full_name'] = ['nullable'];
             $rules['short_name'] = ['nullable'];
             $rules['password'] = ['nullable'];
