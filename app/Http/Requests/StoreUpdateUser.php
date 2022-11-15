@@ -35,7 +35,7 @@ class StoreUpdateUser extends FormRequest
         ];
 
         if($this->method() == 'PUT'){
-            $rules['full_home'] = ['nullable'];
+            $rules['full_name'] = ['nullable'];
             $rules['short_name'] = ['nullable'];
             $rules['password'] = ['nullable'];
             $rules['cpf'] = ['nullable'];
