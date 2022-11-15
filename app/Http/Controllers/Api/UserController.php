@@ -71,9 +71,9 @@ class UserController extends Controller
      * @param  string $identify
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreUpdateUser $request, $identify)
+    public function update(StoreUpdateUser $request, $user)
     {
-        $user = $this->model->where('uuid', $identify)->firstOrFail();
+        $user = $this->model->where('uuid', $user)->firstOrFail();
 
         $data = $request->validated();
 
