@@ -20,11 +20,12 @@ Route::put('/users/cell-confirmed/{identify}', [UserConfirmedController::class, 
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/resources', [ResourceController::class, 'index']);
-
+    
     Route::get('/users/can/{permission}', [PermissionUserController::class, 'userHasPermission']);
     Route::get('/users/{identify}/permissions', [PermissionUserController::class, 'permissonsUser']);
     Route::post('/users/permissions', [PermissionUserController::class, 'addPermissonsUser']);
     Route::delete('/users/permissions', [PermissionUserController::class, 'removePermissonsUser'])->middleware('can:del_permissions_user');
+    Route::put('/users/{identify}', [UserController::class, 'update']);
     Route::apiResource('/users', UserController::class);
 });
 
