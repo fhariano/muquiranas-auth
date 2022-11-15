@@ -73,6 +73,8 @@ class UserController extends Controller
      */
     public function update(StoreUpdateUser $request, $user)
     {
+        Log::channel('auth')->info("request: " . print_r($request, true));
+        
         $user = $this->model->where('uuid', $user)->firstOrFail();
 
         $data = $request->validated();
