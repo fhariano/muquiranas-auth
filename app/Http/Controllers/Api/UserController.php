@@ -126,32 +126,4 @@ class UserController extends Controller
 
         return response()->json(['error' => false, 'message' => 'success',]);
     }
-    
-    public function updateAddress(Request $request, $identify)
-    {
-        Log::channel('auth')->info("UpdateAddress: " . print_r($request->all(), true));
-        $user = $this->model->where('uuid', $identify)->first();
-        
-        
-        try {
-            if ($user) {
-                $user->postal_code = addslashes($request->postal_code);
-                $user->street = addslashes($request->street);
-                $user->number = addslashes($request->number);
-                $user->complement = addslashes($request->complement);
-                $user->district = addslashes($request->district);
-                $user->city = addslashes($request->city);
-                $user->state = addslashes($request->state);
-                $user->country = addslashes($request->country);
-                $user->save();
-            } else {
-                return ['error' => 99, 'message' => 'User not found'];
-            }
-        } catch (Exception $e) {
-            Log::channel('auth')->error("UpdateAddress ERROR: " . print_r($e->getMessage(), true));
-            return ['error' => 1, 'message' => 'UpdateAddress ERROR: ' . $e->getMessage()];
-        }
-        
-        return response()->json(['error' => false, 'message' => 'success',]);
-    }
 }
