@@ -131,17 +131,16 @@ class UserController extends Controller
         Log::channel('auth')->info("UpdateAddress: " . print_r($request->all(), true));
         $user = $this->model->where('uuid', $identify)->first();
         
-        
+      
         try {
             if ($user) {
-                $user->street = '{$request->street}';
-                $user->number = '{$request->number}';
-                $user->complement = '{$request->complement}';
-                $user->district = '{$request->district}';
-                $user->city = '{$request->city}';
-                $user->state = '{$request->state}';
-                $user->country = '{$request->country}';
-                $user->save();
+                $user->street = addslashes($request->street);
+                $user->number = addslashes($request->number);
+                $user->complement = addslashes($request->complement);
+                $user->district = addslashes($request->district);
+                $user->city = addslashes($request->city);
+                $user->state = addslashes($request->state);
+                $user->country = addslashes($request->country);
             } else {
                 return ['error' => 99, 'message' => 'User not found'];
             }
