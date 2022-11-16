@@ -17,6 +17,7 @@ class UserController extends Controller
     public function __construct(User $user)
     {
         $this->model = $user;
+        $this->middleware('can:users');
     }
 
     /**
