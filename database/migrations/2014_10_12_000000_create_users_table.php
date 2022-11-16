@@ -25,13 +25,14 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('confirmation_token', 10)->nullable();
             $table->boolean('cell_confirmed')->default(false);
-            $table->string('device')->nullable();
+            $table->string('device', 45)->nullable();
             $table->string('postal_code', 9)->nullable();
             $table->string('street')->nullable();
-            $table->string('complement')->nullable();
+            $table->string('number', 45)->nullable();
+            $table->string('complement', 100)->nullable();
             $table->string('district')->nullable();
             $table->string('city')->nullable();
-            $table->string('state')->nullable();
+            $table->string('state', 2)->nullable();
             $table->string('country')->nullable();
             $table->rememberToken();
             $table->softDeletes();
