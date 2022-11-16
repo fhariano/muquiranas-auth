@@ -17,6 +17,7 @@ Route::post('/auth', [AuthController::class, 'auth']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 Route::put('/users/cell-confirmed/{identify}', [UserConfirmedController::class, 'updateCellConfirmed']);
+Route::put('/users/address/{identify}', [UserController::class, 'updateAddress']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/resources', [ResourceController::class, 'index']);
@@ -27,7 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/permissions', [PermissionUserController::class, 'removePermissonsUser'])->middleware('can:del_permissions_user');
     
     Route::apiResource('/users', UserController::class);
-    Route::put('/users/address/{identify}', [UserController::class, 'updateAddress']);
 });
 
 Route::get('/', function () {
