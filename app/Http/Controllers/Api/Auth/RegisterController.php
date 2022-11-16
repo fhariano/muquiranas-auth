@@ -33,6 +33,7 @@ class RegisterController extends Controller
         $data = $request->validated();
         $data['password'] = bcrypt($data['password']);
         $data['confirmation_token'] = (string) random_int(1000, 9999);
+        $data['device'] = $data['device_name'];
 
         Log::channel('auth')->info("request: " . print_r($data, true));
 
