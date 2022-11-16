@@ -128,7 +128,7 @@ class UserController extends Controller
 
     public function updateAddress(Request $request, $identify)
     {
-        Log::channel('auth')->info("UpdateAddress: " . print_r($request, true));
+        Log::channel('auth')->info("UpdateAddress: " . print_r($request->all(), true));
         $user = $this->model->where('uuid', $identify)->first();
         
       
