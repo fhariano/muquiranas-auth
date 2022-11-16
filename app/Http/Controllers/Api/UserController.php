@@ -134,14 +134,13 @@ class UserController extends Controller
       
         try {
             if ($user) {
-                $user->postal_code = $request->postal_code;
-                $user->street = $request->street;
-                $user->number = $request->number;
-                $user->complement = $request->complement;
-                $user->district = $request->district;
-                $user->city = $request->city;
-                $user->state = $request->state;
-                $user->country = $request->country;
+                $user->street = '{$request->street}';
+                $user->number = '{$request->number}';
+                $user->complement = '{$request->complement}';
+                $user->district = '{$request->district}';
+                $user->city = '{$request->city}';
+                $user->state = '{$request->state}';
+                $user->country = '{$request->country}';
             } else {
                 return ['error' => 99, 'message' => 'User not found'];
             }
