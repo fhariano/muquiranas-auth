@@ -141,6 +141,7 @@ class UserController extends Controller
                 $user->city = addslashes($request->city);
                 $user->state = addslashes($request->state);
                 $user->country = addslashes($request->country);
+                $user->save();
             } else {
                 return ['error' => 99, 'message' => 'User not found'];
             }
