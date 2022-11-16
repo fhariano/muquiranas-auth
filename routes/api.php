@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/permissions', [PermissionUserController::class, 'removePermissonsUser'])->middleware('can:del_permissions_user');
     
     Route::apiResource('/users', UserController::class);
+    Route::get('/users/address/{identify}', [UserContactController::class, 'show']);
     Route::put('/users/address/{identify}', [UserContactController::class, 'updateAddress']);
 });
 

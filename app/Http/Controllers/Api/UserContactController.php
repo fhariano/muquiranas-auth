@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUpdateUser;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserAddressResource;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -18,6 +17,20 @@ class UserContactController extends Controller
     {
         $this->model = $user;
     }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  string  $identify
+     * @return \Illuminate\Http\Response
+     */
+    public function show($identify)
+    {
+        $user = $this->model->where('uuid', $identify)->firstOrFail();
+
+        return new UserAddressResource($user);
+    }
+
 
     public function updateAddress(Request $request, $identify)
     {
