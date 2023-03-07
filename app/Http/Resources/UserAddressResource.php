@@ -22,7 +22,6 @@ class UserAddressResource extends JsonResource
             'city' => $this->city,
             'state' => $this->state,
             'country' => $this->country,
-            'permissions' => PermissionResource::collection($this->permissions),
         ];
     }
 }
