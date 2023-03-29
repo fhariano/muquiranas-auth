@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -31,10 +32,13 @@ class AuthController extends Controller
             // if(!$user->cell_confirmed){
             //     $msg = ['CELL_NOT_CONFIRMED'];
             // }
+            Log::channel('auth')->error("AUTH ERROR: " . $msg);
             throw ValidationException::withMessages($msg)->status(406);
         }
 
         // return $user->createToken($request->device_name)->plainTextToken;
+        Log::channel('auth')->info("AUTH USER: " . print_r(new UserResource($user), true));
+
         return (new UserResource($user))->additional([
             'token' => $user->createToken($request->device_name)->plainTextToken,
         ]);
