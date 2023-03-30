@@ -37,7 +37,7 @@ class AuthController extends Controller
         }
 
         // return $user->createToken($request->device_name)->plainTextToken;
-        Log::channel('auth')->info("AUTH USER: " . print_r(new UserResource($user), true));
+        // Log::channel('auth')->info("AUTH USER: " . print_r(new UserResource($user), true));
 
         return (new UserResource($user))->additional([
             'token' => $user->createToken($request->device_name)->plainTextToken,
@@ -53,6 +53,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
+        Log::channel('auth')->info("AUTH ME: " . print_r($request->user()));
         $user = $request->user();
 
         return new UserResource($user);
