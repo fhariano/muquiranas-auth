@@ -16,7 +16,7 @@ Route::post('/register', [RegisterController::class, 'store']);
 Route::post('/resendCode', [RegisterController::class, 'resendCode']);
 Route::post('/auth', [AuthController::class, 'auth']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
-Route::get('/me', [AuthController::class, 'me']);
+Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 Route::put('/users/cell-confirmed/{identify}', [UserConfirmedController::class, 'updateCellConfirmed']);
 
 Route::middleware('auth:sanctum')->group(function () {
