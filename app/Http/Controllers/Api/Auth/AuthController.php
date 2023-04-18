@@ -53,7 +53,7 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        Log::channel('auth')->info("AUTH ME: " . print_r($request->headers));
+        // Log::channel('auth')->info("AUTH ME: " . print_r($request->headers));
         $user = $request->user();
 
         return new UserResource($user);
