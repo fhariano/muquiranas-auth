@@ -34,6 +34,7 @@ class CreateUsersTable extends Migration
             $table->string('city')->nullable();
             $table->string('state', 2)->nullable();
             $table->string('country')->nullable();
+            $table->boolean('is_pdv_user')->default(false);
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

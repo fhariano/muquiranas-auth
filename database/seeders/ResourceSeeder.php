@@ -54,5 +54,8 @@ class ResourceSeeder extends Seeder
         $admin->permissions()->create(['name' => 'users']);
         $admin->permissions()->create(['name' => 'add_permissions_user']);
         $admin->permissions()->create(['name' => 'del_permissions_user']);
+
+        $admin = Resource::create(['name' => 'PDVs']);
+        $admin->permissions()->create(['name' => 'operar_pdv']);
     }
 }
