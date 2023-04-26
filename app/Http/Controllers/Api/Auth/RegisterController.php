@@ -39,7 +39,7 @@ class RegisterController extends Controller
 
         $user = $this->model->create($data);
 
-        if ($data['device_name'] == 'mobile') {
+        if ($data['device_name'] == 'mobile' || $data['device_name'] == 'pdv') {
             Log::channel('auth')->info("Permissons User!");
             $permissionsCustomer = [
                 'visualizar_bares',
@@ -60,6 +60,10 @@ class RegisterController extends Controller
                 'salvar_cartao',
                 'recuperar_cartao',
             ];
+
+            if($data['device_name'] == 'pdv'){
+                array_push($permissionsCustomer, 'operar_pdv');
+            }
 
             $permissions = Permission::select('id')->whereIn('name', $permissionsCustomer)->orderBy('id', 'asc')->get();
             // Log::channel('auth')->info("Permissons Ids: " . print_r($permissions->toArray(), true));
