@@ -32,7 +32,7 @@ class AuthController extends Controller
             // if(!$user->cell_confirmed){
             //     $msg = ['CELL_NOT_CONFIRMED'];
             // }
-            Log::channel('auth')->error("AUTH ERROR: " . $msg);
+            Log::channel('auth')->error("AUTH ERROR: " . print_r($msg, true));
             throw ValidationException::withMessages($msg)->status(406);
         }
 
